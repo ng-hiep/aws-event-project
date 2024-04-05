@@ -208,7 +208,23 @@ Este proyecto está licenciado bajo la [Licencia MIT](LICENSE). Consulta el arch
 -----------------------
 
 <details>
-<summary>English</summary>
+<summary>English with Español</summary>
+
+# Book Management Form
+This project (*Este proyecto*) consists of (*consiste en*) a web form (*un formulario web*) developed in (*desarrollado en*) Flask that (*que*) allows users (*permite a los usuarios*) to record information about books (*registrar información sobre libros*) like (*como*) title, author, genre, year of publication, and publisher (*título, autor, género, año de publicación y editorial*). The data (*Los datos*) entered (*ingresados*) in the form (*en el formulario*) is stored (*se almacenan*) in an AWS DynamoDB database (*base de datos*)
+
+
+Additionally, an automated data flow is implemented using AWS services. A DynamoDB stream feeds a pipeline that sends data to an SQS queue. From there, a Lambda is invoked to perform transformations on the data and then store it in an Amazon S3 bucket.
+
+Finally, data stored in S3 can be queried using Amazon Athena for analysis and reporting.
+
+The entire system is deployed and running on an AWS EC2 instance, providing a robust and scalable platform for efficient ledger management and data analysis.
+
+
+## Architecture in AWS
+![Oppido Facundo-AWS](https://github.com/facuoppi/aws-event-project/assets/94979941/5d8dd275-d1d7-40d8-93df-7de378e856d6)
+
+
 
 
 
