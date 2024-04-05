@@ -1,3 +1,6 @@
+<details>
+<summary>Español</summary>
+
 # Formulario de Gestión de Libros
 
 Este proyecto consiste en un formulario web desarrollado en Flask que permite a los usuarios registrar información sobre libros, como título, autor, género, año de publicación y editorial. Los datos ingresados en el formulario se almacenan en una base de datos DynamoDB de AWS.
@@ -199,3 +202,14 @@ Puedes encontrarme en [LinkedIn](https://www.linkedin.com/in/facuoppi/).
 ## Licencia
 
 Este proyecto está licenciado bajo la [Licencia MIT](LICENSE). Consulta el archivo `LICENSE` para obtener más detalles.
+
+</details>
+
+-----------------------
+
+<details>
+<summary>English</summary>
+
+
+
+</details>
