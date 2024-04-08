@@ -224,8 +224,197 @@ The entire system is deployed and running on an AWS EC2 instance, providing a ro
 ## Architecture in AWS
 ![Oppido Facundo-AWS](https://github.com/facuoppi/aws-event-project/assets/94979941/5d8dd275-d1d7-40d8-93df-7de378e856d6)
 
+## Deploying a Flask Application on EC2 with Gunicorn and Nginx
+
+I'll take you step by step through setting up a Flask application on an EC2 instance, using Gunicorn as the WSGI server and Nginx as a reverse proxy.
+
+Let's go a little deeper into each step:
+
+### Step 1: Install Python Virtualenv
+
+```cmd
+sudo apt-get update
+sudo apt-get install python3-venv
+```
+
+This step is responsible for ensuring that your EC2 instance has all the necessary tools to create and manage virtual environments for Python.  
+
+
+### Step 2: Configure the Virtual Environment
+```cmd
+mkdir project
+cd project
+python3 -m venv venv
+source venv/bin/activate
+```
+Here we create a directory for the project and configure a virtual environment within it. Enabling the virtual environment isolates project dependencies, avoiding conflicts with other Python projects on the same machine.
 
 
 
+### Step 3: Install Flask
+
+```cmd
+pip install flask
+```
+This installs the Flask framework within the virtual environment, allowing you to develop web applications using Python.
+
+### Step 4: Install Flask-WTF
+
+```cmd
+pip install Flask-WTF
+```
+
+Extension for Flask that provides integration with the WTForms package, a Python library for creating web forms. Flask-WTF simplifies the creation and validation of HTML forms in Flask applications.
+
+
+### Step 5: Install boto3
+
+```cmd
+pip install boto3 
+```
+
+Python client interface for interacting with Amazon Web Services (AWS) cloud services.
+
+### Step 6: Create a Simple API with Flask (Clone Github Repository)
+
+```cmd
+git clone https://github.com/facuoppi/aws-event-project.git
+cd ..
+mv project/aws-event-project/* project/
+rm -r project/aws-event-project
+```
+
+You clone your Flask application code from a GitHub repository.
+
+```cmd
+cd project/
+python app.py
+```
+
+We verify that the application works ensures that your Flask API is correctly configured.
+
+### Step 7: Install Gunicorn
+
+```cmd
+pip install gunicorn
+```
+
+Gunicorn, or Green Unicorn, is a WSGI server for running Flask applications. Installing it is a crucial step to deploy a production-ready Flask application.
+
+
+```cmd
+gunicorn -b 0.0.0.0:8000 app:app
+```
+
+
+Run Gunicorn, joining to the address 0.0.0.0:8000 and specifying the entry point of your Flask application (app:app).
+
+### Step 8: Use systemd to Manage Gunicorn
+
+Create a systemd unit file to manage the Gunicorn process as a service.
+
+```bash
+sudo nano /etc/systemd/system/project.service
+```
+
+
+The unit file specifies the user, working directory, and command to start Gunicorn as a service.
+
+```ini
+[Unit]
+Description=Gunicorn instance for a de-project
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/project
+ExecStart=/home/ubuntu/project/venv/bin/gunicorn -b 0.0.0.0:8000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+In this way we allow traffic to our application. After creating the unit file, you enable and start the Gunicorn service.
+
+```bash 
+sudo systemctl daemon-reload
+sudo systemctl start project
+sudo systemctl enable project
+```
+
+### Step 9: Execute Nginx Web Server
+
+```bash
+sudo apt-get install nginx
+```
+
+Nginx is a web server that will act as a reverse proxy for your Flask application, forwarding requests to Gunicorn.
+
+```cmd
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+Starting and enabling Nginx ensures that it runs automatically after a system reboot.
+```bash
+sudo nano /etc/nginx/sites-available/default
+```
+
+You configure Nginx by editing its default configuration file, specifying the upstream server (Gunicorn) and the location to forward requests.
+
+```nginx
+upstream flask_project {
+    server 127.0.0.1:5000;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+        proxy_pass http://flask_project;
+        try_files $uri $uri/ =404;
+    }
+
+    location /exito {
+        alias /home/ubuntu/project/templates/;
+        index exito.html;
+        try_files $uri =404;
+        allow all;
+    }
+
+    location /registrar_libro {
+        proxy_pass http://flask_project;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+After editing the configuration, restart Nginx to apply the changes.
+
+```bash
+sudo systemctl restart nginx
+```
+
+Visiting the public IP address of your EC2 instance in a browser confirms that your Flask application is now accessible through Nginx, completing the deployment process.
+
+## Final
+
+Thank you very much for your visit! I hope the information has been useful to you. 😊 
+
+# License
+Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE para obtener más detalles.
 
 </details>
+
+

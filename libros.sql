@@ -6,6 +6,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS libros (
   id STRING,
   autor STRING
 )
+
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
   'serialization.format' = '1'
